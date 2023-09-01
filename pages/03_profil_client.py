@@ -43,29 +43,22 @@ with col3:
 ###############################################################
 @st.cache_data
 def read_X_test_raw():
-    X_test_raw = pd.read_csv(r"C:\Users\serge\OneDrive\Documents\Documents\DATA SCIENTIST\P7\data\preproc\X_test_raw.csv")
+    X_test_raw = pd.read_csv("data/X_test_raw.csv")
     return X_test_raw
 
 # mise en cache de la fonction pour exécution unique
 #####################################################
 @st.cache_data 
 def read_X_test():
-    X_test = pd.read_csv(r"C:\Users\serge\OneDrive\Documents\Documents\DATA SCIENTIST\P7\data\X_test.csv")
+    X_test = pd.read_csv("data/X_test.csv")
     X_test = X_test.rename(columns=str.lower)
     return X_test
-
-# mise en cache de la fonction pour exécution unique
-####################################################
-@st.cache_data 
-def read_description_variables():
-    description_variables = pd.read_csv(r"C:\Users\serge\OneDrive\Documents\Documents\DATA SCIENTIST\P7\data\preproc\description_variable.csv", sep=";")
-    return description_variables
 
 
 if __name__ == "__main__":
 
     read_X_test_raw()
-    read_description_variables()
+    read_X_test()
 
 # Reponse client
 ################    
@@ -92,7 +85,7 @@ if __name__ == "__main__":
 
     #Chargement du modèle pour prédiction et score
     ##############################################
-    model_LGBM = joblib.load(open("LGBM4_saved.joblib","rb"))
+    model_LGBM = joblib.load(open("notebooks/LGBM5_saved.joblib","rb"))
     target_pred = model_LGBM.predict(read_X_test_raw().drop(labels="sk_id_curr", axis=1))    # Prédiction de la classe 0 ou 1
     target_proba = model_LGBM.predict_proba(read_X_test_raw().drop(labels="sk_id_curr", axis=1)) # Prédiction du % de risque
 
