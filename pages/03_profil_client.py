@@ -203,7 +203,7 @@ if __name__ == "__main__":
        medianprops = {'color':"black"}
        meanprops = {'marker':'o', 'markeredgecolor':'black',
             'markerfacecolor':'yellow'}
-       ax_dist=sns.boxplot( x=df_work.loc[df_work['segmentation_risque']==m]['segmentation_risque'],y=df_work['classe_1_proba'], showfliers=False,medianprops=medianprops, showmeans=True, meanprops=meanprops)
+       ax_dist=sns.boxplot( x=df_work.loc[df_work['segmentation_risque']==m]['segmentation_risque'],y=df_work.loc[df_work['segmentation_risque']==m]['classe_1_proba'], showfliers=False,medianprops=medianprops, showmeans=True, meanprops=meanprops)
        #plt.title("Distribution de défaut de paiement par Segmentation du risque\n",
           #loc="center", fontsize=14, fontstyle='italic')
        #plt.ylabel(m)
