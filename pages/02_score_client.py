@@ -40,25 +40,26 @@ with col3:
 # décorateur mise en cache de la fonction pour exécution unique
 ################################################################
 @st.cache_data 
-def read_X_test_raw():
-    X_test_raw = pd.read_csv(r"C:\Users\serge\OneDrive\Documents\Documents\DATA SCIENTIST\P7\data\preproc\X_test_raw.csv")
+def load_X_test_raw():
+    X_test_raw_data_path = Path() / 'data/X_test_raw.csv'
+    X_test_raw = pd.read_csv(X_test_raw_data_path)
     return X_test_raw
 
 
 # décorateur mise en cache de la fonction pour exécution unique
 ################################################################
 @st.cache_data 
-def read_X_test_mod():
-    X_test_mod = pd.read_csv(r"C:\Users\serge\OneDrive\Documents\Documents\DATA SCIENTIST\P7\data\preproc\X_test_mod.csv")
+def load_X_test_mod():
+    X_test_mod_data_path=Path() / 'data/X_test_mod.csv'
+    X_test_mod = pd.read_csv(X_test_mod_data_path)
     return X_test_mod
 
 
 
 if __name__ == "__main__":
 
-    read_X_test_raw()
-    read_X_test_mod()
-    
+    load_X_test_raw()
+    load_X_test_mod()
 
 # Evaluation de la demande
 ##########################
@@ -72,7 +73,7 @@ if __name__ == "__main__":
     
 # Création liste déroulante identifiant client
 ##############################################
-    liste_ID = list(read_X_test_raw()['sk_id_curr'])
+    liste_ID = list(load_X_test_raw()['sk_id_curr'])
     col1, col2,col3 = st.columns(3) # division de la largeur de la page en 3 pour diminuer la taille du menu déroulant
     with col1:
         ID_client = st.selectbox("*Sélectionnez ou entrez l'identifiant du client*", 
@@ -87,13 +88,13 @@ if __name__ == "__main__":
     
 # Lecture du modèle de prédiction et des scores 
 ###############################################
-
-model_LGBM = joblib.load(open(r"C:\Users\serge\OneDrive\Documents\Documents\DATA SCIENTIST\P7\P7_api\LGBM5_saved.joblib",'rb'))
-target_pred = model_LGBM.predict(read_X_test_raw().drop(labels="sk_id_curr", axis=1))
+model_LGBM_path=Path() / 'modeles/LGBM5_saved.joblib'
+model_LGBM = joblib.load(open(model_LGBM_path,'rb'))
+target_pred = model_LGBM.predict(load_X_test_raw().drop(labels="sk_id_curr", axis=1))
 
 # Prédiction de la classe 0 ou 1
-target_proba = model_LGBM.predict_proba(read_X_test_raw().drop(labels="sk_id_curr", axis=1))# Prédiction du % de risque
-#st.write(read_X_test_raw().loc[read_X_test_raw()["sk_id_curr"]==ID_client])
+target_proba = model_LGBM.predict_proba(load_X_test_raw().drop(labels="sk_id_curr", axis=1))# Prédiction du % de risque
+#st.write(load_X_test_raw().loc[load_X_test_raw()["sk_id_curr"]==ID_client])
 #st.write(target_proba[4])
 
 
@@ -101,7 +102,7 @@ target_proba = model_LGBM.predict_proba(read_X_test_raw().drop(labels="sk_id_cur
 #score du client
 ##################
 df_target_proba = pd.DataFrame(target_proba, columns=['classe_0_proba', 'classe_1_proba'])
-df_target_proba = pd.concat([df_target_proba['classe_1_proba'],read_X_test_raw()['sk_id_curr']], axis=1)
+df_target_proba = pd.concat([df_target_proba['classe_1_proba'],load_X_test_raw()['sk_id_curr']], axis=1)
 
 score = df_target_proba[df_target_proba['sk_id_curr']==ID_client]
 score_value = round(score.classe_1_proba.iloc[0]*100, 2)
@@ -110,7 +111,7 @@ score_value = round(score.classe_1_proba.iloc[0]*100, 2)
 # Récupération de la prédiction et mise en forme de la décision
 ###############################################################
 df_target_pred = pd.DataFrame(target_pred, columns=['predictions'])
-df_target_pred = pd.concat([df_target_pred, read_X_test_raw()['sk_id_curr']], axis=1)
+df_target_pred = pd.concat([df_target_pred, load_X_test_raw()['sk_id_curr']], axis=1)
 df_target_pred['client'] = np.where(df_target_pred.predictions == 1, "insolvable", "solvable")
 df_target_pred['decision'] = np.where(df_target_pred.predictions == 1, "refuser", "accorder")
 solvabilite = df_target_pred.loc[df_target_pred['sk_id_curr']==ID_client, "client"].values
@@ -172,11 +173,11 @@ st.write("")
 # Calcul des valeurs Shap
 ###########################
 explainer_shap = shap.TreeExplainer(model_LGBM)
-shap_values = explainer_shap.shap_values(read_X_test_raw().drop(labels="sk_id_curr", axis=1))
+shap_values = explainer_shap.shap_values(load_X_test_raw().drop(labels="sk_id_curr", axis=1))
 
 # récupération de l'index correspondant à l'identifiant du client
 #################################################################
-idx = int(read_X_test_raw()[read_X_test_raw()['sk_id_curr']==ID_client].index[0])
+idx = int(load_X_test_raw()[load_X_test_raw()['sk_id_curr']==ID_client].index[0])
 
 # Graphique force_plot
 #######################
@@ -185,7 +186,7 @@ st.write("Il indique les variables qui augmentent la probabilité du client d'ê
             en défaut de paiement (en rouge) et celles qui la diminuent (en bleu), ainsi que la grandeur de cet impact.")
 st_shap(shap.force_plot(explainer_shap.expected_value[1], 
                             shap_values[1][idx,:], 
-                            read_X_test_raw().drop(labels="sk_id_curr", axis=1).iloc[idx,:], 
+                            load_X_test_raw().drop(labels="sk_id_curr", axis=1).iloc[idx,:], 
                             link='logit',
                             figsize=(20, 8),
                             ordering_keys=True,
@@ -199,8 +200,8 @@ st.write("Le graphique`decision_plot` est une autre façon d'expliquer la prédi
 st.write("Seules les 15 variables explicatives les plus importantes sont affichées par ordre décroissant.")
 st_shap(shap.decision_plot(explainer_shap.expected_value[1], 
                             shap_values[1][idx,:], 
-                            read_X_test_raw().drop(labels="sk_id_curr", axis=1).iloc[idx,:], 
-                            feature_names=read_X_test_raw().drop(labels="sk_id_curr", axis=1).columns.to_list(),
+                            load_X_test_raw().drop(labels="sk_id_curr", axis=1).iloc[idx,:], 
+                            feature_names=load_X_test_raw().drop(labels="sk_id_curr", axis=1).columns.to_list(),
                             feature_order='importance',
                             feature_display_range=slice(None, -20, -1), # affichage des 15 variables les + importantes
                             link='logit'))
@@ -222,7 +223,7 @@ lorsqu'ils sont pertubés sont considérés comme ayant une importance élevée 
 
 st.write("En bleu les caractéristiques qui renforcent la classe 0 avec leur importance")
 
-explainer_lime=lime_tabular.LimeTabularExplainer(read_X_test_raw().iloc[:,1:].values,feature_names=read_X_test_raw().iloc[:,1:].columns.values.tolist(),
+explainer_lime=lime_tabular.LimeTabularExplainer(load_X_test_raw().iloc[:,1:].values,feature_names=load_X_test_raw().iloc[:,1:].columns.values.tolist(),
                                             class_names=["pas_faillite_paiement","en_faillite_paiement"],
                                             verbose=True,
                                             mode="classification")
@@ -231,9 +232,9 @@ explainer_lime=lime_tabular.LimeTabularExplainer(read_X_test_raw().iloc[:,1:].va
 #####################
 
 
-expl=explainer_lime.explain_instance(read_X_test_raw().iloc[:,1:].iloc[idx,:],model_LGBM.predict_proba,num_features=15)
+expl=explainer_lime.explain_instance(load_X_test_raw().iloc[:,1:].iloc[idx,:],model_LGBM.predict_proba,num_features=15)
 fig=expl.as_pyplot_figure(label=1)
 # afficher l'explication
 #######################
-st.write("identifiant client :", read_X_test_raw().iloc[idx, 0])
+st.write("identifiant client :", load_X_test_raw().iloc[idx, 0])
 components.html(expl.as_html(), height=1000)
