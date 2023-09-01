@@ -41,8 +41,7 @@ with col3:
 ################################################################
 @st.cache_data 
 def load_X_test_raw():
-    X_test_raw_data_path = Path() / 'data/X_test_raw.csv'
-    X_test_raw = pd.read_csv(X_test_raw_data_path)
+    X_test_raw = pd.read_csv('data/X_test_raw.csv')
     return X_test_raw
 
 
@@ -50,8 +49,7 @@ def load_X_test_raw():
 ################################################################
 @st.cache_data 
 def load_X_test_mod():
-    X_test_mod_data_path=Path() / 'data/X_test_mod.csv'
-    X_test_mod = pd.read_csv(X_test_mod_data_path)
+    X_test_mod = pd.read_csv('data/X_test_mod.csv')
     return X_test_mod
 
 
@@ -88,8 +86,8 @@ if __name__ == "__main__":
     
 # Lecture du modèle de prédiction et des scores 
 ###############################################
-model_LGBM_path=Path() / 'modeles/LGBM5_saved.joblib'
-model_LGBM = joblib.load(open(model_LGBM_path,'rb'))
+
+model_LGBM = joblib.load(open('notebooks/LGBM5_saved.joblib','rb'))
 target_pred = model_LGBM.predict(load_X_test_raw().drop(labels="sk_id_curr", axis=1))
 
 # Prédiction de la classe 0 ou 1
