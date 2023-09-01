@@ -86,8 +86,8 @@ if __name__ == "__main__":
     
 # Lecture du modèle de prédiction et des scores 
 ###############################################
-model_LGBM_path=Path() / 'modeles/LGBM5_saved.joblib'
-model_LGBM = joblib.load(open(model_LGBM_path,'rb'))
+
+model_LGBM = joblib.load(open('modeles/LGBM5_saved.joblib','rb'))
 target_pred = model_LGBM.predict(load_X_test_raw().drop(labels="sk_id_curr", axis=1))
 
 # Prédiction de la classe 0 ou 1
