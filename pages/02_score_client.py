@@ -41,7 +41,7 @@ with col3:
 ################################################################
 @st.cache_data 
 def load_X_test_raw():
-    X_test_raw_data_path = Path() / 'data/X_test_raw.csv'
+    X_test_raw_data_path = Path( / 'data/X_test_raw.csv')
     X_test_raw = pd.read_csv(X_test_raw_data_path)
     return X_test_raw
 
@@ -50,7 +50,7 @@ def load_X_test_raw():
 ################################################################
 @st.cache_data 
 def load_X_test_mod():
-    X_test_mod_data_path=Path() / 'data/X_test_mod.csv'
+    X_test_mod_data_path=Path( / 'data/X_test_mod.csv')
     X_test_mod = pd.read_csv(X_test_mod_data_path)
     return X_test_mod
 
